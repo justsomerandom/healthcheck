@@ -10,3 +10,9 @@ members = [
 [workspace.package]
 edition = "2021"
 license = "MIT"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+uuid = { version = "1", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
