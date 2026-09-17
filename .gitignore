@@ -10,3 +10,5 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+*.db
+*.sqlite
