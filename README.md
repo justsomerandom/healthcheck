@@ -2,7 +2,7 @@
 
 HealthCheck is planned as a distributed monitoring platform for remote services, local processes, and service dependency chains. The project is intended to explore reliable monitoring, agent/server communication, dependency-aware incident modeling, and root-cause-oriented health visualization.
 
-This repository currently contains the initial project foundation and the first shared core domain types. Monitoring behavior has not been implemented yet.
+This repository currently contains the initial project foundation, the first shared core domain types, and one-shot HTTP check execution. Recurring monitoring behavior has not been implemented yet.
 
 ## Goals
 
@@ -13,7 +13,7 @@ This repository currently contains the initial project foundation and the first 
 
 ## Planned Features
 
-- Remote HTTP checks.
+- One-shot remote HTTP checks.
 - TCP checks.
 - DNS checks.
 - TLS and certificate checks.
@@ -44,7 +44,7 @@ flowchart LR
 
 ## Repository Structure
 
-- `crates/server` - planned central API, persistence, scheduling, and incident evaluation service.
+- `crates/server` - one-shot HTTP check execution plus planned central API, persistence, scheduling, and incident evaluation service.
 - `crates/agent` - planned lightweight deployable monitor for local processes and system metrics.
 - `crates/core` - shared domain types for projects, services, checks, health status, and check results.
 - `crates/protocol` - planned server/agent communication structures.
@@ -63,7 +63,7 @@ flowchart LR
 - PostgreSQL - planned persistence layer.
 - Server-sent events or WebSockets - planned live event transport.
 
-Only the Rust workspace structure and initial core domain model are currently present.
+Only the Rust workspace structure, initial core domain model, and one-shot HTTP check execution are currently present.
 
 ## Development
 
@@ -73,7 +73,8 @@ Setup instructions will be expanded as implementation begins. No dependencies be
 
 - [ ] Define core health-check and incident domain models. Initial health-check domain types are in place; incident modeling is still pending.
 - [ ] Establish server configuration and persistence migrations.
-- [ ] Implement basic remote HTTP checks.
+- [x] Implement one-shot remote HTTP check execution.
+- [ ] Implement repeated scheduling of enabled checks.
 - [ ] Add agent registration and observation ingestion.
 - [ ] Add local process and system monitoring.
 - [ ] Model service dependencies and incident propagation.
