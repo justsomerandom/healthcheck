@@ -2,7 +2,7 @@
 
 HealthCheck is planned as a distributed monitoring platform for remote services, local processes, and service dependency chains. The project is intended to explore reliable monitoring, agent/server communication, dependency-aware incident modeling, and root-cause-oriented health visualization.
 
-This repository currently contains the initial project foundation, the first shared core domain types, and one-shot HTTP check execution. Recurring monitoring behavior has not been implemented yet.
+This repository currently contains the initial project foundation, the first shared core domain types, one-shot HTTP check execution, and an in-memory recurring scheduler. Persistence and daemon/API surfaces have not been implemented yet.
 
 ## Goals
 
@@ -19,7 +19,7 @@ This repository currently contains the initial project foundation, the first sha
 - TLS and certificate checks.
 - Local process and service monitoring.
 - CPU, memory, and process metrics from local agents.
-- Configurable polling intervals.
+- In-memory recurring checks with configurable polling intervals.
 - Health history and incident tracking.
 - Dependency graphs between services and checks.
 - Dependency-aware failure visualization.
@@ -33,7 +33,7 @@ The intended architecture is a central server that stores checks, receives obser
 ```mermaid
 flowchart LR
     Agent[Local Agent] -->|observations| Server[HealthCheck Server]
-    Server --> Database[(PostgreSQL)]
+    Server --> Database[(SQLite)]
     Server --> Api[HTTP API / Live Events]
     Api --> Dashboard[Optional Dashboard]
     Core[core crate] -. shared domain logic .- Server
@@ -44,7 +44,7 @@ flowchart LR
 
 ## Repository Structure
 
-- `crates/server` - one-shot HTTP check execution plus planned central API, persistence, scheduling, and incident evaluation service.
+- `crates/server` - in-memory scheduling, one-shot HTTP check execution, result sink abstractions, and planned central API, persistence, and incident evaluation service.
 - `crates/agent` - planned lightweight deployable monitor for local processes and system metrics.
 - `crates/core` - shared domain types for projects, services, checks, health status, and check results.
 - `crates/protocol` - planned server/agent communication structures.
@@ -60,10 +60,10 @@ flowchart LR
 - Tokio - planned asynchronous runtime.
 - Axum - planned HTTP server framework.
 - SQLx - planned database access layer.
-- PostgreSQL - planned persistence layer.
+- SQLite - planned persistence layer.
 - Server-sent events or WebSockets - planned live event transport.
 
-Only the Rust workspace structure, initial core domain model, and one-shot HTTP check execution are currently present.
+Only the Rust workspace structure, initial core domain model, one-shot HTTP check execution, and in-memory recurring scheduler are currently present.
 
 ## Development
 
@@ -74,7 +74,8 @@ Setup instructions will be expanded as implementation begins. No dependencies be
 - [ ] Define core health-check and incident domain models. Initial health-check domain types are in place; incident modeling is still pending.
 - [ ] Establish server configuration and persistence migrations.
 - [x] Implement one-shot remote HTTP check execution.
-- [ ] Implement repeated scheduling of enabled checks.
+- [x] Implement repeated scheduling of enabled checks.
+- [ ] Add SQLite-backed persistence for projects, services, checks, and check results.
 - [ ] Add agent registration and observation ingestion.
 - [ ] Add local process and system monitoring.
 - [ ] Model service dependencies and incident propagation.

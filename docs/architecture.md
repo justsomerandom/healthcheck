@@ -25,4 +25,26 @@ HTTP result semantics are:
 - `Unhealthy` means the target was observed failing, including unexpected HTTP status, connection failure, DNS/TLS request failure, or timeout.
 - `Unknown` is reserved for cases where the monitoring mechanism cannot interpret or execute the check itself, such as an unsupported future check kind.
 
-Scheduling, worker pools, persistence, APIs, local agents, and distributed protocol transport are still future work.
+## Scheduler Runtime
+
+The server crate now includes an in-memory recurring scheduler:
+
+```text
+Configured Check
+      |
+      v
+Scheduler
+      |
+      v
+CheckExecutor
+      |
+      v
+CheckResult
+      |
+      v
+ResultSink
+```
+
+Scheduling uses fixed-delay semantics: a check's next run becomes due after the previous execution completes plus the configured interval. This avoids catch-up bursts and naturally prevents overlapping executions of the same check. Different checks may execute concurrently.
+
+The current scheduler keeps configuration and runtime state in memory. Completed results are recorded through a `ResultSink`; `InMemoryResultSink` is available for tests and early runtime validation. Persistent storage, APIs, local agents, and distributed protocol transport are still future work.

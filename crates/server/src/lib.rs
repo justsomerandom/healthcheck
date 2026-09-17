@@ -1,3 +1,5 @@
-//! Server-side behavior for executing configured health checks.
+//! Server-side behavior for executing and scheduling configured health checks.
 
 pub mod execution;
+pub mod results;
+pub mod scheduler;

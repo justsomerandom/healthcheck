@@ -9,6 +9,4 @@ publish = false
 healthcheck-core = { path = "../core" }
 reqwest.workspace = true
 tokio.workspace = true
-
-[dev-dependencies]
 uuid.workspace = true
