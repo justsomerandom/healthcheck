@@ -2,7 +2,7 @@
 
 HealthCheck is planned as a distributed monitoring platform for remote services, local processes, and service dependency chains. The project is intended to explore reliable monitoring, agent/server communication, dependency-aware incident modeling, and root-cause-oriented health visualization.
 
-This repository currently contains only the initial project foundation. Monitoring behavior has not been implemented yet.
+This repository currently contains the initial project foundation and the first shared core domain types. Monitoring behavior has not been implemented yet.
 
 ## Goals
 
@@ -46,7 +46,7 @@ flowchart LR
 
 - `crates/server` - planned central API, persistence, scheduling, and incident evaluation service.
 - `crates/agent` - planned lightweight deployable monitor for local processes and system metrics.
-- `crates/core` - planned shared domain types and monitoring logic.
+- `crates/core` - shared domain types for projects, services, checks, health status, and check results.
 - `crates/protocol` - planned server/agent communication structures.
 - `migrations` - future SQLx database migrations.
 - `config/examples` - example configuration files once configuration is introduced.
@@ -63,7 +63,7 @@ flowchart LR
 - PostgreSQL - planned persistence layer.
 - Server-sent events or WebSockets - planned live event transport.
 
-Only the Rust workspace structure is currently present.
+Only the Rust workspace structure and initial core domain model are currently present.
 
 ## Development
 
@@ -71,7 +71,7 @@ Setup instructions will be expanded as implementation begins. No dependencies be
 
 ## Roadmap
 
-- [ ] Define core health-check and incident domain models.
+- [ ] Define core health-check and incident domain models. Initial health-check domain types are in place; incident modeling is still pending.
 - [ ] Establish server configuration and persistence migrations.
 - [ ] Implement basic remote HTTP checks.
 - [ ] Add agent registration and observation ingestion.
