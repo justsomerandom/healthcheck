@@ -43,6 +43,35 @@ impl Check {
             created_at: Utc::now(),
         })
     }
+
+    /// Reconstructs a check from previously persisted domain fields.
+    pub fn from_persisted(
+        id: Uuid,
+        service_id: Uuid,
+        kind: CheckKind,
+        interval_seconds: u64,
+        timeout_ms: u64,
+        enabled: bool,
+        created_at: DateTime<Utc>,
+    ) -> Result<Self, DomainError> {
+        if interval_seconds == 0 {
+            return Err(DomainError::ZeroInterval);
+        }
+
+        if timeout_ms == 0 {
+            return Err(DomainError::ZeroTimeout);
+        }
+
+        Ok(Self {
+            id,
+            service_id,
+            kind,
+            interval_seconds,
+            timeout_ms,
+            enabled,
+            created_at,
+        })
+    }
 }
 
 /// Type-specific configuration for a health check.
@@ -149,6 +178,24 @@ mod tests {
         let error = CheckKind::http("  ", 200).expect_err("blank URL should fail");
 
         assert_eq!(error, DomainError::EmptyHttpUrl);
+    }
+
+    #[test]
+    fn reconstructs_persisted_check() {
+        let id = Uuid::new_v4();
+        let service_id = Uuid::new_v4();
+        let created_at = Utc::now();
+        let kind = CheckKind::http("https://example.com/health", 204).expect("kind is valid");
+        let check = Check::from_persisted(id, service_id, kind.clone(), 60, 500, false, created_at)
+            .expect("check is valid");
+
+        assert_eq!(check.id, id);
+        assert_eq!(check.service_id, service_id);
+        assert_eq!(check.kind, kind);
+        assert_eq!(check.interval_seconds, 60);
+        assert_eq!(check.timeout_ms, 500);
+        assert!(!check.enabled);
+        assert_eq!(check.created_at, created_at);
     }
 
     #[test]

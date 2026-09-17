@@ -33,6 +33,25 @@ impl CheckResult {
             error,
         }
     }
+
+    /// Reconstructs a check result from previously persisted domain fields.
+    pub fn from_persisted(
+        id: Uuid,
+        check_id: Uuid,
+        checked_at: DateTime<Utc>,
+        status: HealthStatus,
+        duration_ms: u64,
+        error: Option<String>,
+    ) -> Self {
+        Self {
+            id,
+            check_id,
+            checked_at,
+            status,
+            duration_ms,
+            error,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -54,5 +73,18 @@ mod tests {
         assert_eq!(result.duration_ms, 250);
         assert_eq!(result.error.as_deref(), Some("connection refused"));
         assert_ne!(result.id, Uuid::nil());
+    }
+
+    #[test]
+    fn reconstructs_persisted_check_result() {
+        let id = Uuid::new_v4();
+        let check_id = Uuid::new_v4();
+        let checked_at = Utc::now();
+        let result =
+            CheckResult::from_persisted(id, check_id, checked_at, HealthStatus::Healthy, 12, None);
+
+        assert_eq!(result.id, id);
+        assert_eq!(result.check_id, check_id);
+        assert_eq!(result.checked_at, checked_at);
     }
 }

@@ -47,4 +47,41 @@ ResultSink
 
 Scheduling uses fixed-delay semantics: a check's next run becomes due after the previous execution completes plus the configured interval. This avoids catch-up bursts and naturally prevents overlapping executions of the same check. Different checks may execute concurrently.
 
-The current scheduler keeps configuration and runtime state in memory. Completed results are recorded through a `ResultSink`; `InMemoryResultSink` is available for tests and early runtime validation. Persistent storage, APIs, local agents, and distributed protocol transport are still future work.
+The scheduler keeps runtime state in memory after startup. Completed results are recorded through a `ResultSink`; `InMemoryResultSink` is available for tests and early runtime validation.
+
+## Persistence
+
+SQLite is the MVP persistence backend. SQLx migrations under `migrations/` are the schema source of truth for projects, services, checks, and check results.
+
+```text
+SQLite
+  |
+  v
+Repositories
+  |
+  v
+Load enabled checks
+  |
+  v
+Scheduler
+  |
+  v
+CheckExecutor
+  |
+  v
+CheckResult
+  |
+  v
+SqliteResultSink
+  |
+  v
+SQLite
+```
+
+Domain models remain database-independent: `healthcheck-core` does not depend on SQLx or SQLite types. Persistence modules map database rows to core domain values and fail explicitly on invalid UUIDs, timestamps, enum values, or domain invariants.
+
+Checks are loaded from SQLite at startup and registered with the in-memory scheduler. The scheduler does not poll the database on each tick; dynamic reload can be added later. Result persistence is integrated through `SqliteResultSink`, preserving the same `ResultSink` boundary used by `InMemoryResultSink`.
+
+UUIDs are stored as canonical text. Timestamps are stored as UTC RFC3339 strings. Enums use explicit stable strings such as `HTTP`, `HEALTHY`, `DEGRADED`, `UNHEALTHY`, and `UNKNOWN`; these formats are compatibility-sensitive.
+
+The current schema stores HTTP-specific check fields (`url`, `expected_status`) directly on `checks` because HTTP is the only implemented check kind. PostgreSQL, REST APIs, local agents, distributed protocol transport, and hot reload of database changes are still future work.

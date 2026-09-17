@@ -24,6 +24,21 @@ impl Service {
             created_at: Utc::now(),
         })
     }
+
+    /// Reconstructs a service from previously persisted domain fields.
+    pub fn from_persisted(
+        id: Uuid,
+        project_id: Uuid,
+        name: impl Into<String>,
+        created_at: DateTime<Utc>,
+    ) -> Result<Self, DomainError> {
+        Ok(Self {
+            id,
+            project_id,
+            name: validate_name("service", name)?,
+            created_at,
+        })
+    }
 }
 
 #[cfg(test)]
@@ -46,5 +61,18 @@ mod tests {
             Service::new(Uuid::new_v4(), "\t\n").expect_err("blank service name should fail");
 
         assert_eq!(error, DomainError::EmptyName { entity: "service" });
+    }
+
+    #[test]
+    fn reconstructs_persisted_service() {
+        let id = Uuid::new_v4();
+        let project_id = Uuid::new_v4();
+        let created_at = Utc::now();
+        let service =
+            Service::from_persisted(id, project_id, "API", created_at).expect("service is valid");
+
+        assert_eq!(service.id, id);
+        assert_eq!(service.project_id, project_id);
+        assert_eq!(service.created_at, created_at);
     }
 }

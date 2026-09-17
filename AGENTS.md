@@ -20,6 +20,11 @@ HealthCheck is intended to become a distributed monitoring platform for remote s
 - Keep server-specific concerns in `crates/server`.
 - Keep local host inspection and reporting in `crates/agent`.
 - Do not let server persistence details leak into agent code.
+- Keep `crates/core` SQLx- and database-independent.
+- Keep SQL and SQLite-specific code inside server persistence/infrastructure modules.
+- Do not bypass repository or result-sink boundaries from scheduler code.
+- Treat migrations as the authoritative schema; schema changes require migrations.
+- Treat persisted enum string formats as compatibility-sensitive storage contracts.
 - Treat dependency graph evaluation as domain logic, not UI logic.
 - Document protocol changes before relying on them across crates.
 
@@ -40,7 +45,7 @@ HealthCheck is intended to become a distributed monitoring platform for remote s
 
 ## Testing
 
-Future tests should cover core state transitions, check scheduling behavior, protocol compatibility, API contracts, persistence boundaries, and agent/server integration paths. Unit tests should live near domain code; integration tests should focus on realistic monitoring flows.
+Future tests should cover core state transitions, check scheduling behavior, protocol compatibility, API contracts, persistence boundaries, and agent/server integration paths. Unit tests should live near domain code; integration tests should focus on realistic monitoring flows. Persistence tests must exercise SQLx migrations rather than constructing schema manually.
 
 ## Documentation
 

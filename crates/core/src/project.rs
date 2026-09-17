@@ -22,6 +22,19 @@ impl Project {
             created_at: Utc::now(),
         })
     }
+
+    /// Reconstructs a project from previously persisted domain fields.
+    pub fn from_persisted(
+        id: Uuid,
+        name: impl Into<String>,
+        created_at: DateTime<Utc>,
+    ) -> Result<Self, DomainError> {
+        Ok(Self {
+            id,
+            name: validate_name("project", name)?,
+            created_at,
+        })
+    }
 }
 
 pub(crate) fn validate_name(
@@ -61,5 +74,16 @@ mod tests {
         let error = Project::new("   ").expect_err("blank project name should fail");
 
         assert_eq!(error, DomainError::EmptyName { entity: "project" });
+    }
+
+    #[test]
+    fn reconstructs_persisted_project() {
+        let id = Uuid::new_v4();
+        let created_at = Utc::now();
+        let project =
+            Project::from_persisted(id, "Persisted", created_at).expect("project is valid");
+
+        assert_eq!(project.id, id);
+        assert_eq!(project.created_at, created_at);
     }
 }

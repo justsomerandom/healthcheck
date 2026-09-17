@@ -2,7 +2,7 @@
 
 HealthCheck is planned as a distributed monitoring platform for remote services, local processes, and service dependency chains. The project is intended to explore reliable monitoring, agent/server communication, dependency-aware incident modeling, and root-cause-oriented health visualization.
 
-This repository currently contains the initial project foundation, the first shared core domain types, one-shot HTTP check execution, and an in-memory recurring scheduler. Persistence and daemon/API surfaces have not been implemented yet.
+This repository currently contains the initial project foundation, shared core domain types, one-shot HTTP check execution, an in-memory recurring scheduler, and SQLite-backed persistence. CLI, daemon, REST API, local agent, and distributed protocol surfaces have not been implemented yet.
 
 ## Goals
 
@@ -20,6 +20,7 @@ This repository currently contains the initial project foundation, the first sha
 - Local process and service monitoring.
 - CPU, memory, and process metrics from local agents.
 - In-memory recurring checks with configurable polling intervals.
+- SQLite-backed storage for projects, services, checks, and check results.
 - Health history and incident tracking.
 - Dependency graphs between services and checks.
 - Dependency-aware failure visualization.
@@ -44,11 +45,11 @@ flowchart LR
 
 ## Repository Structure
 
-- `crates/server` - in-memory scheduling, one-shot HTTP check execution, result sink abstractions, and planned central API, persistence, and incident evaluation service.
+- `crates/server` - SQLite persistence, in-memory scheduling, one-shot HTTP check execution, result sink abstractions, and planned central API and incident evaluation service.
 - `crates/agent` - planned lightweight deployable monitor for local processes and system metrics.
 - `crates/core` - shared domain types for projects, services, checks, health status, and check results.
 - `crates/protocol` - planned server/agent communication structures.
-- `migrations` - future SQLx database migrations.
+- `migrations` - SQLx SQLite database migrations.
 - `config/examples` - example configuration files once configuration is introduced.
 - `docs` - architecture and protocol notes.
 - `scripts` - future developer and operational scripts.
@@ -57,13 +58,13 @@ flowchart LR
 ## Technology Stack
 
 - Rust - primary language.
-- Tokio - planned asynchronous runtime.
+- Tokio - asynchronous runtime.
 - Axum - planned HTTP server framework.
-- SQLx - planned database access layer.
-- SQLite - planned persistence layer.
+- SQLx - database access layer.
+- SQLite - MVP persistence layer.
 - Server-sent events or WebSockets - planned live event transport.
 
-Only the Rust workspace structure, initial core domain model, one-shot HTTP check execution, and in-memory recurring scheduler are currently present.
+Only the Rust workspace structure, initial core domain model, one-shot HTTP check execution, in-memory recurring scheduler, and SQLite persistence are currently present.
 
 ## Development
 
@@ -72,10 +73,10 @@ Setup instructions will be expanded as implementation begins. No dependencies be
 ## Roadmap
 
 - [ ] Define core health-check and incident domain models. Initial health-check domain types are in place; incident modeling is still pending.
-- [ ] Establish server configuration and persistence migrations.
+- [x] Establish SQLite persistence migrations and repositories.
 - [x] Implement one-shot remote HTTP check execution.
 - [x] Implement repeated scheduling of enabled checks.
-- [ ] Add SQLite-backed persistence for projects, services, checks, and check results.
+- [ ] Build CLI/application layer for creating resources, starting monitoring, and reporting persisted health state.
 - [ ] Add agent registration and observation ingestion.
 - [ ] Add local process and system monitoring.
 - [ ] Model service dependencies and incident propagation.
