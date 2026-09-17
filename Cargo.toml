@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/server",
+  "crates/agent",
+  "crates/core",
+  "crates/protocol",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
