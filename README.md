@@ -2,7 +2,35 @@
 
 HealthCheck is planned as a distributed monitoring platform for remote services, local processes, and service dependency chains. The project is intended to explore reliable monitoring, agent/server communication, dependency-aware incident modeling, and root-cause-oriented health visualization.
 
-This repository currently contains the initial project foundation, shared core domain types, one-shot HTTP check execution, an in-memory recurring scheduler, and SQLite-backed persistence. CLI, daemon, REST API, local agent, and distributed protocol surfaces have not been implemented yet.
+HealthCheck currently provides a usable local monitoring workflow for HTTP services: a durable SQLite-backed CLI creates projects, services, and checks; records an initial result immediately; and runs recurring checks until stopped.
+
+## Quick Start
+
+Build and run the local CLI with a database of your choice. The database is created and migrated automatically.
+
+```powershell
+cargo run -p healthcheck-server -- --database .\healthcheck.db project create Platform
+# Copy the project id printed above.
+cargo run -p healthcheck-server -- --database .\healthcheck.db service create <project-id> API
+# Copy the service id printed above.
+cargo run -p healthcheck-server -- --database .\healthcheck.db check http <service-id> https://example.com/health --interval-seconds 30 --timeout-ms 5000
+cargo run -p healthcheck-server -- --database .\healthcheck.db monitor
+```
+
+Press Ctrl+C to stop monitoring gracefully. Checks and every completed result remain in SQLite, so a later `monitor` command reloads enabled checks automatically.
+
+Inspect the persisted state at any time:
+
+```powershell
+cargo run -p healthcheck-server -- --database .\healthcheck.db project list
+cargo run -p healthcheck-server -- --database .\healthcheck.db project summary <project-id>
+cargo run -p healthcheck-server -- --database .\healthcheck.db service health <service-id> --history 10
+cargo run -p healthcheck-server -- --database .\healthcheck.db check list <service-id>
+cargo run -p healthcheck-server -- --database .\healthcheck.db check disable <check-id>
+cargo run -p healthcheck-server -- --database .\healthcheck.db check enable <check-id>
+```
+
+The default database path is `healthcheck.db` in the current directory. Set `RUST_LOG=info` to see structured monitor lifecycle logs.
 
 ## Goals
 
@@ -76,7 +104,7 @@ Setup instructions will be expanded as implementation begins. No dependencies be
 - [x] Establish SQLite persistence migrations and repositories.
 - [x] Implement one-shot remote HTTP check execution.
 - [x] Implement repeated scheduling of enabled checks.
-- [ ] Build CLI/application layer for creating resources, starting monitoring, and reporting persisted health state.
+- [x] Build CLI/application layer for creating resources, starting monitoring, and reporting persisted health state.
 - [ ] Add agent registration and observation ingestion.
 - [ ] Add local process and system monitoring.
 - [ ] Model service dependencies and incident propagation.

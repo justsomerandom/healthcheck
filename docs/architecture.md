@@ -85,3 +85,11 @@ Checks are loaded from SQLite at startup and registered with the in-memory sched
 UUIDs are stored as canonical text. Timestamps are stored as UTC RFC3339 strings. Enums use explicit stable strings such as `HTTP`, `HEALTHY`, `DEGRADED`, `UNHEALTHY`, and `UNKNOWN`; these formats are compatibility-sensitive.
 
 The current schema stores HTTP-specific check fields (`url`, `expected_status`) directly on `checks` because HTTP is the only implemented check kind. PostgreSQL, REST APIs, local agents, distributed protocol transport, and hot reload of database changes are still future work.
+
+## Local CLI Product Slice
+
+`healthcheck-server` is also the local CLI executable. Its application layer opens the configured SQLite path, validates and applies migrations, and composes existing repositories, the HTTP executor, scheduler, and SQLite result sink. The CLI itself only parses commands and renders human-readable reports.
+
+Creating an HTTP check persists the enabled check and immediately executes it through `HttpCheckExecutor`; the first result is saved before the command returns. `monitor` loads enabled checks from SQLite at startup and passes them to the existing fixed-delay scheduler. Ctrl+C resolves the scheduler shutdown future, allowing active executions to finish and results to persist before exit.
+
+Reporting is a separate server read-model layer. It combines repository reads into project summaries, service health, latest result per check, recent history, and enabled state. A service is `UNKNOWN` if it has no enabled checks or an enabled check has no result; an unhealthy enabled check makes the service unhealthy. Project status aggregates its service statuses using the same severity ordering.
